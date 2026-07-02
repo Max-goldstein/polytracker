@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/polytracker/">
+<title>PolyTracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#0f0e0d;--white:#f0ead6;--gray:#7a7060;--light-gray:#c8bfa8;--border:#2d2a24;--accent:#e8a020;
+  --green:#3ddc84;--green-bg:rgba(61,220,132,.08);--green-b:rgba(61,220,132,.25);
+  --red:#e05d5d;--red-bg:rgba(224,93,93,.08);--red-b:rgba(224,93,93,.25);
+  --orange:#e8a020;--orange-bg:rgba(232,160,32,.08);
+  --yellow:#e8a020;--yellow-bg:rgba(232,160,32,.08);
+  --blue:#58a6ff;
+}
+body[data-theme="1"]{ --black:#0f0e0d;--white:#f0ead6;--gray:#7a7060;--light-gray:#c8bfa8;--border:#2d2a24;--accent:#e8a020; }
+body[data-theme="2"]{ --black:#0a0a0a;--white:#f5f5f0;--gray:#888;--light-gray:#d4d4d0;--border:#2a2a2a;--accent:#f5f5f0; }
+body[data-theme="3"]{ --black:#0d1117;--white:#e6edf3;--gray:#6e7681;--light-gray:#b1bac4;--border:#21262d;--accent:#58a6ff; }
+body[data-theme="4"]{ --black:#0a0f0d;--white:#d4ede0;--gray:#4a7060;--light-gray:#8ab8a0;--border:#1e2e24;--accent:#3ddc84; }
+
+html,body{height:100%;overflow:hidden;background:var(--black);color:var(--white);
+  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:300;font-size:13px;
+  transition:background .4s,color .4s}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:0}
+
+/* ── theme bar ────────────────────────── */
+.theme-bar{position:fixed;bottom:1.2rem;right:1.2rem;z-index:500;display:flex;gap:.5rem;
+  align-items:center;background:var(--black);border:1px solid var(--border);padding:.5rem .8rem;
+  transition:background .4s,border-color .4s}
+.theme-label{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.2em;
+  color:var(--gray);text-transform:uppercase;margin-right:.2em}
+.theme-btn{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--gray);background:none;
+  border:1px solid var(--border);width:22px;height:22px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.theme-btn:hover,.theme-btn.active{color:var(--white);border-color:var(--accent);background:var(--border)}
+
+/* ── header ───────────────────────────── */
+#hdr{
+  background:var(--black);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .4s,border-color .4s;
+}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-mark{
+  width:30px;height:30px;flex-shrink:0;
+  border:1px solid var(--accent);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  transition:border-color .4s,color .4s;
+}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;color:var(--white)}
+.logo-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--gray);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.live{display:flex;align-items:center;gap:5px;background:var(--green-bg);
+  border:1px solid var(--green-b);color:var(--green);
+  padding:3px 8px;font-size:10px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:.1em}
+.live-dot{width:5px;height:5px;background:var(--green);border-radius:50%;
+  animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.cd{color:var(--gray);font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.05em}
+.cd span{color:var(--accent)}
+.btn-r{background:none;border:1px solid var(--border);color:var(--gray);
+  padding:6px 12px;cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;transition:.15s}
+.btn-r:hover{color:var(--white);border-color:var(--accent)}
+
+/* ── stat bar ─────────────────────────── */
+#sbar{
+  background:var(--black);border-bottom:1px solid var(--border);
+  padding:9px 24px;flex-shrink:0;
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  transition:background .4s,border-color .4s;
+}
+.st{display:flex;align-items:center;gap:7px}
+.st-l{color:var(--gray);font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.15em}
+.st-v{font-size:14px;font-weight:400;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.st-sep{width:1px;height:14px;background:var(--border)}
+
+/* ── main tabs ────────────────────────── */
+#mtabs{
+  background:var(--black);border-bottom:1px solid var(--border);
+  padding:0 24px;flex-shrink:0;display:flex;
+  transition:background .4s,border-color .4s;
+}
+.mtab{
+  padding:13px 18px;font-size:12px;font-weight:400;cursor:pointer;
+  font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;
+  border-bottom:2px solid transparent;color:var(--gray);
+  display:flex;align-items:center;gap:7px;transition:.15s;user-select:none;
+}
+.mtab:hover{color:var(--light-gray)}
+.mtab.on{color:var(--white);border-bottom-color:var(--accent)}
+.mtab-ct{background:var(--border);color:var(--gray);padding:1px 6px;
+  font-size:10px;font-weight:600;font-family:'DM Mono',monospace}
+.mtab.on .mtab-ct{color:var(--accent)}
+
+/* ── category bar ─────────────────────── */
+#cats{
+  background:var(--black);border-bottom:1px solid var(--border);
+  padding:9px 24px;flex-shrink:0;
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  transition:background .4s,border-color .4s;
+}
+#cats::-webkit-scrollbar{display:none}
+.cat-btn{
+  white-space:nowrap;padding:5px 12px;cursor:pointer;
+  font-size:11px;font-weight:400;border:1px solid var(--border);font-family:'DM Mono',monospace;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:var(--gray);background:transparent;transition:.15s;user-select:none;
+  display:flex;align-items:center;gap:5px;
+}
+.cat-btn:hover{color:var(--light-gray);border-color:var(--light-gray)}
+.cat-btn.on{
+  color:var(--accent);border-color:var(--accent);
+}
+
+/* ── content ──────────────────────────── */
+#wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.panel{flex:1;overflow-y:auto;padding:18px 24px;display:none}
+.panel.on{display:block}
+
+/* ── filter row ───────────────────────── */
+.frow{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.srch{position:relative;flex:1;min-width:180px;max-width:300px}
+.srch svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  color:var(--gray);pointer-events:none}
+input[type=search]{
+  width:100%;background:var(--black);border:1px solid var(--border);
+  color:var(--white);padding:7px 9px 7px 30px;font-family:'DM Mono',monospace;
+  font-size:12px;outline:none;transition:.15s;
+}
+input[type=search]:focus{border-color:var(--accent)}
+input[type=search]::placeholder{color:var(--gray)}
+.fl{color:var(--gray);font-size:11px;font-family:'DM Mono',monospace;
+  text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+select{
+  background:var(--black);border:1px solid var(--border);color:var(--light-gray);
+  padding:6px 9px;font-size:11px;font-family:'DM Mono',monospace;outline:none;cursor:pointer;
+}
+select:focus{border-color:var(--accent)}
+
+/* ── table ────────────────────────────── */
+.tw{overflow-x:auto;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead{position:sticky;top:0;z-index:2}
+th{
+  background:var(--black);color:var(--gray);font-size:9px;font-weight:600;font-family:'DM Mono',monospace;
+  text-transform:uppercase;letter-spacing:.12em;padding:10px 12px;
+  text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--border)}
+
+.c-rk{width:38px;text-align:center}
+.c-q{min-width:220px}
+.c-y{width:76px;text-align:right}
+.c-n{width:76px;text-align:right}
+.c-v{width:102px;text-align:right}
+.c-t{width:102px;text-align:right}
+.c-e{width:78px;text-align:right}
+.c-a{width:42px;text-align:center}
+
+.rk{color:var(--gray);font-size:11px;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.mq{font-size:13px;line-height:1.4;color:var(--light-gray);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mq a{color:var(--light-gray);text-decoration:none}
+.mq a:hover{color:var(--accent)}
+
+.pp{display:inline-flex;align-items:center;padding:2px 7px;
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;
+  font-family:'DM Mono',monospace}
+.pp-y{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+.pp-n{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)}
+
+.vn{font-variant-numeric:tabular-nums;font-size:12px;font-family:'DM Mono',monospace}
+.vbar{margin-top:3px;height:2px;background:var(--accent);opacity:.5}
+
+.ed{font-size:11px;color:var(--gray);font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.ed-s{color:var(--orange)}
+
+.lnk{
+  background:none;border:1px solid var(--border);color:var(--gray);
+  width:26px;height:26px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:12px;transition:.15s;
+}
+.lnk:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── insider cards ────────────────────── */
+.cg{display:flex;flex-direction:column;gap:10px}
+
+.ic{
+  background:var(--black);border:1px solid var(--border);
+  padding:16px 18px;transition:.2s;
+}
+.ic:hover{background:var(--border)}
+.ic.h{border-color:var(--red-b)}
+.ic.m{border-color:var(--orange-bg)}
+
+.ic-top{display:flex;align-items:flex-start;gap:13px;margin-bottom:10px}
+.sb{
+  flex-shrink:0;width:42px;height:42px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;line-height:1;font-family:'DM Mono',monospace;border:1px solid;
+}
+.sb-n{font-size:16px}.sb-x{font-size:8px;opacity:.65;margin-top:1px}
+.sb.h{background:var(--red-bg);border-color:var(--red-b);color:var(--red)}
+.sb.m{background:var(--orange-bg);border-color:rgba(232,160,32,.35);color:var(--orange)}
+.sb.l{background:var(--yellow-bg);border-color:rgba(232,160,32,.25);color:var(--yellow)}
+
+.ic-tw{flex:1;min-width:0}
+.ic-q{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.02em;
+  color:var(--white);line-height:1.3;margin-bottom:4px}
+.ic-q a{color:inherit;text-decoration:none}
+.ic-q a:hover{color:var(--accent)}
+.ic-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:10px;
+  font-family:'DM Mono',monospace;color:var(--gray);text-transform:uppercase;letter-spacing:.08em}
+
+.sigs{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.sr{display:flex;align-items:flex-start;gap:7px;padding:8px 10px;border:1px solid transparent}
+.sr.HIGH{background:var(--red-bg);border-color:var(--red-b)}
+.sr.MEDIUM{background:var(--orange-bg);border-color:rgba(232,160,32,.2)}
+.sr.LOW{background:var(--yellow-bg);border-color:rgba(232,160,32,.15)}
+.si{flex-shrink:0;font-size:13px;margin-top:1px}
+.sb2{}
+.st2{font-size:9px;font-weight:700;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.HIGH .st2{color:var(--red)}.MEDIUM .st2{color:var(--orange)}.LOW .st2{color:var(--yellow)}
+.sd{color:var(--light-gray);font-size:12px;line-height:1.4;font-weight:300}
+
+.ic-ft{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  padding-top:10px;border-top:1px solid var(--border);
+}
+.ic-pr{display:flex;gap:6px;align-items:center}
+.ic-vs{display:flex;gap:12px}
+.vi{font-size:10px;font-family:'DM Mono',monospace}
+.vi span:first-child{color:var(--gray);margin-right:3px;text-transform:uppercase;letter-spacing:.05em}
+.vi span:last-child{font-variant-numeric:tabular-nums;font-weight:500;color:var(--light-gray)}
+
+.ic-ac{display:flex;gap:6px}
+.btn-pm{
+  background:none;border:1px solid var(--border);color:var(--gray);
+  padding:5px 10px;cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;
+  letter-spacing:.05em;text-transform:uppercase;
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:.15s;
+}
+.btn-pm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-tr{
+  background:none;border:1px solid var(--accent);color:var(--accent);
+  padding:5px 10px;cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;
+  letter-spacing:.05em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:4px;transition:.15s;
+}
+.btn-tr:hover{background:var(--accent);color:var(--black)}
+
+/* ── modal ────────────────────────────── */
+#mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);
+  z-index:100;align-items:center;justify-content:center;padding:20px}
+#mo.open{display:flex}
+#md{background:var(--black);border:1px solid var(--border);
+  width:100%;max-width:660px;max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.mh{padding:16px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.mh-t{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.03em;color:var(--white)}
+.mh-s{font-size:11px;color:var(--gray);margin-top:3px;font-family:'DM Mono',monospace}
+.mc{padding:18px;overflow-y:auto;flex:1}
+.btn-x{background:none;border:1px solid var(--border);color:var(--gray);cursor:pointer;
+  font-size:16px;line-height:1;padding:3px 8px;margin-left:8px;flex-shrink:0}
+.btn-x:hover{color:var(--white);border-color:var(--accent)}
+
+.cb-wrap{margin:8px 0 12px}
+.cb-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;
+  color:var(--gray);font-family:'DM Mono',monospace}
+.cb-track{height:5px;background:var(--border);overflow:hidden}
+.cb-fill{height:100%;transition:width .4s}
+.c-alert{padding:8px 12px;font-size:12px;margin-bottom:12px;
+  background:var(--red-bg);border:1px solid var(--red-b);color:var(--red);font-family:'DM Mono',monospace}
+.wt{width:100%;border-collapse:collapse;font-size:12px}
+.wt th{color:var(--gray);padding:6px 9px;border-bottom:1px solid var(--border);
+  text-align:left;font-weight:600;font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
+.wt td{padding:7px 9px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.wt tr:last-child td{border-bottom:none}
+.wa{color:var(--blue);font-family:'DM Mono',monospace;font-size:11px}
+.ws{height:3px;background:var(--accent);margin-top:3px;opacity:.6}
+
+.trs{margin-top:14px}
+.sec-l{font-size:9px;font-weight:600;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.15em;
+  color:var(--gray);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.tr-row{display:flex;align-items:center;justify-content:space-between;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px;font-family:'DM Mono',monospace}
+.tr-row:last-child{border-bottom:none}
+.t-buy{color:var(--green);font-weight:600;font-size:9px;text-transform:uppercase;
+  background:var(--green-bg);padding:1px 5px;white-space:nowrap;font-family:'DM Mono',monospace}
+.t-sell{color:var(--red);font-weight:600;font-size:9px;text-transform:uppercase;
+  background:var(--red-bg);padding:1px 5px;white-space:nowrap;font-family:'DM Mono',monospace}
+.t-a{color:var(--blue);font-family:'DM Mono',monospace;font-size:10px}
+.t-m{color:var(--gray);font-size:11px}
+
+/* ── suggestion cards ────────────────── */
+.bankroll-bar{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  background:var(--black);border:1px solid var(--border);
+  padding:11px 15px;flex-wrap:wrap;
+}
+.bankroll-bar label{font-size:11px;color:var(--gray);white-space:nowrap;font-family:'DM Mono',monospace;
+  text-transform:uppercase;letter-spacing:.08em}
+.bankroll-bar input[type=number]{
+  background:var(--black);border:1px solid var(--border);color:var(--white);
+  padding:6px 9px;font-size:12px;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace;
+  outline:none;width:140px;
+}
+.bankroll-bar input[type=number]:focus{border-color:var(--accent)}
+.bankroll-bar input[type=number]::placeholder{color:var(--gray)}
+.bankroll-note{font-size:10px;color:var(--gray);margin-left:auto;font-family:'DM Mono',monospace}
+.disclaimer{font-size:11px;color:var(--gray);font-style:italic;font-family:'DM Sans',sans-serif}
+
+.sg{background:var(--black);border:1px solid var(--border);padding:18px 20px;transition:.2s}
+.sg:hover{background:var(--border)}
+.sg.sg-a{border-color:var(--green-b)}
+.sg.sg-b{border-color:rgba(232,160,32,.3)}
+.sg.sg-c{border-color:rgba(232,160,32,.2)}
+
+.sg-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.conf-ring{
+  flex-shrink:0;width:48px;height:48px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;line-height:1;border:2px solid;font-family:'DM Mono',monospace;
+}
+.conf-ring.a{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.conf-ring.b{border-color:var(--accent);color:var(--accent);background:var(--orange-bg)}
+.conf-ring.c{border-color:var(--orange);color:var(--orange);background:var(--orange-bg)}
+.conf-num{font-size:15px}.conf-lbl{font-size:8px;opacity:.7;margin-top:1px}
+
+.sg-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.dir-badge{
+  padding:3px 9px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  font-family:'DM Mono',monospace;
+}
+.dir-yes{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+.dir-no{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)}
+.cat-pill{font-size:9px;color:var(--gray);background:var(--border);padding:2px 7px;
+  text-transform:uppercase;font-family:'DM Mono',monospace;letter-spacing:.05em}
+.days-pill{font-size:9px;color:var(--gray);font-family:'DM Mono',monospace;text-transform:uppercase}
+
+.sg-q{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.02em;color:var(--white);
+  line-height:1.3;margin-bottom:12px}
+.sg-q a{color:inherit;text-decoration:none}
+.sg-q a:hover{color:var(--accent)}
+
+.trade-box{
+  background:rgba(0,0,0,.2);border:1px solid var(--border);
+  padding:12px 15px;margin-bottom:12px;
+}
+.trade-row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:9px}
+.trade-stat{font-size:11px;font-family:'DM Mono',monospace}
+.trade-stat span:first-child{color:var(--gray);margin-right:4px;text-transform:uppercase;letter-spacing:.05em}
+.trade-stat span:last-child{font-weight:600;font-variant-numeric:tabular-nums;color:var(--light-gray)}
+.sz-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.sz-pct{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.sz-pct.a{color:var(--green)}.sz-pct.b{color:var(--accent)}.sz-pct.c{color:var(--orange)}
+.sz-dollar{font-size:12px;color:var(--gray);font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+.sz-risk{font-size:10px;color:var(--gray);background:var(--border);padding:2px 7px;font-family:'DM Mono',monospace;text-transform:uppercase}
+.sz-track{height:6px;background:var(--border);overflow:hidden}
+.sz-fill{height:100%;transition:width .4s}
+.sz-fill.a{background:var(--green)}.sz-fill.b{background:var(--accent)}.sz-fill.c{background:var(--orange)}
+
+.sg-sigs{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.sg-sr{display:flex;align-items:flex-start;gap:6px;padding:7px 9px;font-size:12px}
+.sg-sr.HIGH{background:var(--red-bg);border:1px solid var(--red-b)}
+.sg-sr.MEDIUM{background:var(--orange-bg);border:1px solid rgba(232,160,32,.2)}
+.sg-sr.LOW{background:var(--yellow-bg);border:1px solid rgba(232,160,32,.15)}
+.sg-sr .si{flex-shrink:0;font-size:12px;margin-top:1px}
+.sg-sr .sd{line-height:1.4;color:var(--light-gray)}
+
+.sg-ft{display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid var(--border)}
+.sg-ft .ic-vs{display:flex;gap:12px}
+.sg-ft .vi{font-size:10px}
+.sg-ft .vi span:first-child{color:var(--gray);margin-right:3px}
+.sg-ft .vi span:last-child{font-variant-numeric:tabular-nums;color:var(--light-gray)}
+.sg-ac{display:flex;gap:6px}
+
+/* ── states ───────────────────────────── */
+.ld{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:50px 20px;color:var(--gray);font-family:'DM Mono',monospace;
+  font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.sp{width:24px;height:24px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:50px 20px;color:var(--gray);text-align:center;font-family:'DM Mono',monospace;
+  font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.empty-i{font-size:26px;opacity:.35;font-family:'DM Sans',sans-serif;letter-spacing:0;text-transform:none}
+.err{color:var(--red);font-size:12px;text-align:center;padding:40px;font-family:'DM Mono',monospace}
+
+@media(max-width:640px){.c-t,.c-e{display:none}}
+</style>
+</head>
+<body data-theme="1" style="display:flex;flex-direction:column;height:100%">
+
+<div class="theme-bar">
+  <span class="theme-label">Theme</span>
+  <button class="theme-btn" data-t="1">1</button>
+  <button class="theme-btn" data-t="2">2</button>
+  <button class="theme-btn" data-t="3">3</button>
+  <button class="theme-btn" data-t="4">4</button>
+</div>
+
+<!-- header -->
+<div id="hdr">
+  <div class="logo">
+    <div class="logo-mark">◈</div>
+    <div>
+      <div class="logo-name">POLYTRACKER</div>
+      <div class="logo-tag">Prediction Market Intelligence</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="live"><span class="live-dot"></span>LIVE</div>
+    <div class="cd">Refresh in <span id="cd">60</span>s</div>
+    <button class="btn-r" onclick="refresh()">⟳ Refresh</button>
+  </div>
+</div>
+<!-- stat bar -->
+<div id="sbar">
+  <div class="st"><span class="st-l">Markets</span><span class="st-v" style="color:var(--green)" id="s-m">—</span></div>
+  <div class="st-sep"></div>
+  <div class="st"><span class="st-l">24h Volume</span><span class="st-v" id="s-v">—</span></div>
+  <div class="st-sep"></div>
+  <div class="st"><span class="st-l">Insider Signals</span><span class="st-v" style="color:var(--red)" id="s-i">—</span></div>
+  <div class="st-sep"></div>
+  <div class="st"><span class="st-l">Updated</span><span class="st-v" style="color:var(--muted)" id="s-u">—</span></div>
+</div>
+
+<!-- main tabs -->
+<div id="mtabs">
+  <div class="mtab on" id="t-tr" onclick="switchTab('tr')">
+    📈 Trending <span class="mtab-ct" id="ct-tr">—</span>
+  </div>
+  <div class="mtab" id="t-in" onclick="switchTab('in')">
+    🔍 Insider Signals <span class="mtab-ct" id="ct-in">—</span>
+  </div>
+  <div class="mtab" id="t-sg" onclick="switchTab('sg')">
+    💡 Suggestions <span class="mtab-ct" id="ct-sg">—</span>
+  </div>
+</div>
+
+<!-- category bar -->
+<div id="cats"></div>
+
+<!-- panels -->
+<div id="wrap">
+
+  <!-- trending -->
+  <div class="panel on" id="p-tr">
+    <div class="frow">
+      <div class="srch">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="q-tr" placeholder="Filter markets…" oninput="renderTr()">
+      </div>
+      <span class="fl">Sort:</span>
+      <select id="so-tr" onchange="renderTr()">
+        <option value="volume24h">24h Volume</option>
+        <option value="volumeTotal">Total Volume</option>
+        <option value="yesPrice-d">YES Price ↓</option>
+        <option value="yesPrice-a">YES Price ↑</option>
+      </select>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th class="c-rk">#</th>
+          <th class="c-q">Market</th>
+          <th class="c-y">YES</th>
+          <th class="c-n">NO</th>
+          <th class="c-v">24h Vol</th>
+          <th class="c-t">Total Vol</th>
+          <th class="c-e">Ends</th>
+          <th class="c-a"></th>
+        </tr></thead>
+        <tbody id="tb-tr">
+          <tr><td colspan="8"><div class="ld"><div class="sp"></div>Loading…</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- insider -->
+  <div class="panel" id="p-in">
+    <div class="frow">
+      <span class="fl">Min score:</span>
+      <select id="ms-in" onchange="renderIn()">
+        <option value="3">3+</option>
+        <option value="5">5+</option>
+        <option value="7">7+ High risk</option>
+      </select>
+      <span class="fl">Signal:</span>
+      <select id="ty-in" onchange="renderIn()">
+        <option value="">All signals</option>
+        <option value="VOLUME_SURGE">Volume Surge</option>
+        <option value="EXTREME_PRICING">Extreme Pricing</option>
+        <option value="THIN_BOOK">Thin Order Book</option>
+      </select>
+      <div class="srch">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="q-in" placeholder="Filter markets…" oninput="renderIn()">
+      </div>
+    </div>
+    <div class="cg" id="cg-in">
+      <div class="ld"><div class="sp"></div>Scanning for suspicious activity…</div>
+    </div>
+  </div>
+
+  <!-- suggestions -->
+  <div class="panel" id="p-sg">
+    <div class="bankroll-bar">
+      <label>Bankroll (optional)</label>
+      <input type="number" id="bankroll" placeholder="e.g. 10000" min="0" oninput="renderSg()">
+      <span class="bankroll-note">Enter your total bankroll to see dollar sizing</span>
+      <span class="fl">Min confidence:</span>
+      <select id="mc-sg" onchange="loadAndRenderSg()">
+        <option value="40">40+</option>
+        <option value="50">50+</option>
+        <option value="60">60+ Strong only</option>
+      </select>
+      <span class="fl">Direction:</span>
+      <select id="dir-sg" onchange="renderSg()">
+        <option value="">All</option>
+        <option value="YES">YES only</option>
+        <option value="NO">NO only</option>
+      </select>
+    </div>
+    <div class="cg" id="cg-sg">
+      <div class="ld"><div class="sp"></div>Calculating trade suggestions…</div>
+    </div>
+    <div style="padding:12px 0;text-align:center" class="disclaimer">
+      Algorithmic suggestions only — not financial advice. Always do your own research.
+    </div>
+  </div>
+
+</div>
+
+<!-- trades modal -->
+<div id="mo" onclick="closeMo(event)">
+  <div id="md">
+    <div class="mh">
+      <div>
+        <div class="mh-t" id="m-t">Trade Analysis</div>
+        <div class="mh-s" id="m-s"></div>
+      </div>
+      <button class="btn-x" onclick="closeMo()">✕</button>
+    </div>
+    <div class="mc" id="m-c">
+      <div class="ld"><div class="sp"></div>Fetching trade data…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── state ──────────────────────────────────────────────────
+let trData = [], inData = [], sgData = [];
+let activeTab = 'tr';
+let activeCat = '';
+let cats = [];
+let cdVal = 60, cdId = null;
+
+// ── format helpers ─────────────────────────────────────────
+const fv = n => {
+  if (!n) return '—';
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'k';
+  return '$' + Math.round(n);
+};
+const fp = n => (!n && n !== 0) ? '—' : Math.round(n * 100) + '%';
+const fd = iso => {
+  if (!iso) return '—';
+  try {
+    const diff = new Date(iso) - Date.now();
+    if (diff < 0) return 'Ended';
+    const d = Math.floor(diff / 86400000);
+    if (d === 0) return 'Today';
+    if (d < 30) return d + 'd';
+    return Math.floor(d/30) + 'mo';
+  } catch { return '—'; }
+};
+const polyUrl = (slug, id) => `https://polymarket.com/event/${slug || id || ''}`;
+const sc = s => s >= 7 ? 'h' : s >= 4 ? 'm' : 'l';
+const siIcon = t => ({VOLUME_SURGE:'⚡',EXTREME_PRICING:'🎯',THIN_BOOK:'🐳'}[t] || '⚠');
+const siLabel = t => ({
+  VOLUME_SURGE: 'Volume Surge',
+  EXTREME_PRICING: 'Extreme Pricing',
+  THIN_BOOK: 'Thin Order Book / Whale Activity',
+}[t] || t);
+const sa = addr => addr ? addr.slice(0,6)+'…'+addr.slice(-4) : '—';
+const esc = s => String(s||'')
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const el = id => document.getElementById(id);
+
+// ── fetch ──────────────────────────────────────────────────
+const apiFetch = async url => {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error((await r.text()).slice(0,200));
+  return r.json();
+};
+
+async function loadCats() {
+  try {
+    const d = await apiFetch('api/categories');
+    cats = d.categories || [];
+    renderCatBar();
+  } catch(e) { console.warn('cats', e); }
+}
+
+async function loadTrending() {
+  const url = `api/trending?limit=1000&tag=${encodeURIComponent(activeCat)}`;
+  const d = await apiFetch(url);
+  trData = d.markets || [];
+}
+
+async function loadInsider() {
+  const url = `api/insider?limit=1000&min_score=3&tag=${encodeURIComponent(activeCat)}`;
+  const d = await apiFetch(url);
+  inData = d.markets || [];
+}
+
+async function loadSuggestions() {
+  const mc  = el('mc-sg').value || 40;
+  const url = `api/suggestions?min_confidence=${mc}&tag=${encodeURIComponent(activeCat)}`;
+  const d   = await apiFetch(url);
+  sgData    = d.suggestions || [];
+}
+
+async function loadStats() {
+  try {
+    const d = await apiFetch('api/stats');
+    el('s-m').textContent = d.markets_tracked ?? '—';
+    el('s-v').textContent = fv(d.total_24h_volume);
+    el('s-i').textContent = d.insider_signals ?? '—';
+    el('s-u').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {}
+}
+
+// ── render category bar ────────────────────────────────────
+function renderCatBar() {
+  el('cats').innerHTML = cats.map(c => `
+    <button class="cat-btn${activeCat === c.slug ? ' on' : ''}"
+      onclick="selectCat('${esc(c.slug)}')">${c.emoji} ${esc(c.name)}
+    </button>`).join('');
+}
+
+function selectCat(slug) {
+  activeCat = slug;
+  renderCatBar();
+  loadAndRender();
+}
+
+// ── render trending table ──────────────────────────────────
+function renderTr() {
+  const q    = (el('q-tr').value || '').toLowerCase();
+  const sort = el('so-tr').value;
+
+  let data = trData.filter(m =>
+    !q || m.question.toLowerCase().includes(q)
+  );
+
+  const [key, dir] = sort.endsWith('-a') ? [sort.slice(0,-2),'a'] :
+                     sort.endsWith('-d') ? [sort.slice(0,-2),'d'] : [sort,'d'];
+  data.sort((a,b) => dir==='a' ? (a[key]||0)-(b[key]||0) : (b[key]||0)-(a[key]||0));
+
+  const maxV = Math.max(...data.map(m => m.volume24h||0), 1);
+  el('ct-tr').textContent = data.length;
+
+  el('tb-tr').innerHTML = data.length ? data.map((m,i) => {
+    const soon = m.daysLeft !== null && m.daysLeft < 3;
+    const bar  = Math.round((m.volume24h / maxV) * 100);
+    return `<tr>
+      <td class="c-rk"><span class="rk">${i+1}</span></td>
+      <td class="c-q">
+        <div class="mq"><a href="${polyUrl(m.slug,m.id)}" target="_blank" rel="noopener">${esc(m.question)}</a></div>
+      </td>
+      <td class="c-y"><span class="pp pp-y">${fp(m.yesPrice)}</span></td>
+      <td class="c-n"><span class="pp pp-n">${fp(m.noPrice)}</span></td>
+      <td class="c-v">
+        <div class="vn" style="font-weight:600">${fv(m.volume24h)}</div>
+        <div class="vbar" style="width:${bar}%"></div>
+      </td>
+      <td class="c-t"><span class="vn" style="color:var(--muted)">${fv(m.volumeTotal)}</span></td>
+      <td class="c-e"><span class="ed${soon?' ed-s':''}">${fd(m.endDate)}</span></td>
+      <td class="c-a">
+        <a class="lnk" href="${polyUrl(m.slug,m.id)}" target="_blank" rel="noopener" title="Open">↗</a>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="8"><div class="empty"><div class="empty-i">📭</div>No markets found</div></td></tr>`;
+}
+
+// ── render insider cards ───────────────────────────────────
+function renderIn() {
+  const ms  = parseInt(el('ms-in').value) || 3;
+  const ty  = el('ty-in').value;
+  const q   = (el('q-in').value || '').toLowerCase();
+
+  let data = inData.filter(m =>
+    m.score >= ms &&
+    (!ty || m.signals.some(s => s.type === ty)) &&
+    (!q  || m.question.toLowerCase().includes(q))
+  );
+
+  el('ct-in').textContent = data.length;
+
+  if (!data.length) {
+    el('cg-in').innerHTML = `<div class="empty"><div class="empty-i">✅</div>No signals match the current filters.</div>`;
+    return;
+  }
+
+  el('cg-in').innerHTML = data.map(m => {
+    const cls = sc(m.score);
+    const cid = m.conditionId || m.id || '';
+    const days = m.daysLeft;
+    const endTxt = days !== null
+      ? (days === 0 ? 'Expires today' : `Expires in ${fd(m.endDate)}`)
+      : '';
+
+    const sigsHtml = m.signals.map(s => `
+      <div class="sr ${s.severity}">
+        <span class="si">${siIcon(s.type)}</span>
+        <div class="sb2">
+          <div class="st2">${siLabel(s.type)}</div>
+          <div class="sd">${esc(s.detail)}</div>
+        </div>
+      </div>`).join('');
+
+    return `
+    <div class="ic ${cls}">
+      <div class="ic-top">
+        <div class="sb ${cls}"><span class="sb-n">${m.score}</span><span class="sb-x">/ 12</span></div>
+        <div class="ic-tw">
+          <div class="ic-q"><a href="${polyUrl(m.slug,m.id)}" target="_blank" rel="noopener">${esc(m.question)}</a></div>
+          <div class="ic-meta">
+            ${endTxt ? `<span>${endTxt}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="sigs">${sigsHtml}</div>
+      <div class="ic-ft">
+        <div class="ic-pr">
+          <span class="pp pp-y">YES ${fp(m.yesPrice)}</span>
+          <span class="pp pp-n">NO ${fp(m.noPrice)}</span>
+        </div>
+        <div class="ic-vs">
+          <div class="vi"><span>24h</span><span>${fv(m.volume24h)}</span></div>
+          <div class="vi"><span>Total</span><span>${fv(m.volumeTotal)}</span></div>
+          ${m.liquidity > 0 ? `<div class="vi"><span>Liq</span><span>${fv(m.liquidity)}</span></div>` : ''}
+        </div>
+        <div class="ic-ac">
+          <a class="btn-pm" href="${polyUrl(m.slug,m.id)}" target="_blank" rel="noopener">View ↗</a>
+          ${cid ? `<button class="btn-tr" onclick="openTrades('${esc(cid)}','${esc(m.question).replace(/'/g,"\\'")}')">🐳 Trades</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── trade modal ────────────────────────────────────────────
+async function openTrades(cid, q) {
+  el('m-t').textContent = 'Trade Analysis';
+  el('m-s').textContent = q.length > 72 ? q.slice(0,72)+'…' : q;
+  el('m-c').innerHTML = '<div class="ld"><div class="sp"></div>Fetching…</div>';
+  el('mo').classList.add('open');
+  try {
+    const d = await apiFetch(`api/trades/${encodeURIComponent(cid)}`);
+    renderModal(d);
+  } catch(e) {
+    el('m-c').innerHTML = `<div class="err">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderModal(d) {
+  const wallets = d.wallets || [];
+  const trades  = d.trades  || [];
+  const top3    = (d.top3_share || 0) * 100;
+  const flagged = d.concentration_signal;
+  const bc      = flagged ? 'var(--red)' : top3 > 50 ? 'var(--orange)' : 'var(--green)';
+
+  let html = '';
+
+  if (wallets.length) {
+    html += `
+      <div class="sec-l">Wallet Concentration — top 3 hold ${top3.toFixed(0)}% of recent volume</div>
+      <div class="cb-wrap">
+        <div class="cb-track"><div class="cb-fill" style="width:${Math.min(top3,100)}%;background:${bc}"></div></div>
+      </div>
+      ${flagged ? `<div class="c-alert">⚠ High concentration: top 3 wallets control ${top3.toFixed(0)}% of volume — possible coordinated buying.</div>` : ''}
+      <table class="wt">
+        <thead><tr><th>Wallet</th><th>Value</th><th>Trades</th><th>Share</th></tr></thead>
+        <tbody>${wallets.map(w => {
+          const sp = ((w.share||0)*100).toFixed(1);
+          return `<tr>
+            <td><span class="wa">${sa(w.address)}</span></td>
+            <td>${fv(w.value)}</td><td>${w.trades}</td>
+            <td>${sp}%<div class="ws" style="width:${Math.round((w.share||0)*100)}%"></div></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+  }
+
+  if (trades.length) {
+    html += `<div class="trs">
+      <div class="sec-l">Recent Trades (${d.total_trades} total)</div>
+      ${trades.slice(0,20).map(t => {
+        const side  = (t.side||'').toUpperCase();
+        const size  = parseFloat(t.size||0).toFixed(2);
+        const price = parseFloat(t.price||0);
+        const val   = (price <= 1 ? parseFloat(t.size||0)*price : parseFloat(t.size||0)*price/100).toFixed(2);
+        const ts    = t.match_time ? new Date(t.match_time*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+        return `<div class="tr-row">
+          <span class="${side==='BUY'?'t-buy':'t-sell'}">${side||'—'}</span>
+          <span class="t-a">${sa(t.maker_address)}</span>
+          <span class="t-m">${size} @ ${(price<=1?price*100:price).toFixed(1)}% ≈ $${val}</span>
+          <span class="t-m">${ts}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  el('m-c').innerHTML = html || '<div class="empty"><div class="empty-i">📭</div>No trade data available</div>';
+}
+
+function closeMo(e) {
+  if (!e || e.target === el('mo')) el('mo').classList.remove('open');
+}
+
+// ── suggestions render ─────────────────────────────────────
+function confTier(c) { return c >= 70 ? 'a' : c >= 55 ? 'b' : 'c'; }
+function confColor(c) {
+  return c >= 70 ? 'var(--green)' : c >= 55 ? 'var(--accent)' : 'var(--orange)';
+}
+
+function renderSg() {
+  const dirF   = el('dir-sg').value;
+  const bankroll = parseFloat(el('bankroll').value) || 0;
+
+  let data = sgData.filter(s => !dirF || s.direction === dirF);
+  el('ct-sg').textContent = data.length;
+
+  if (!data.length) {
+    el('cg-sg').innerHTML = `<div class="empty"><div class="empty-i">💡</div>No suggestions match current filters.</div>`;
+    return;
+  }
+
+  el('cg-sg').innerHTML = data.map(s => {
+    const tier   = confTier(s.confidence);
+    const cid    = s.conditionId || s.id || '';
+    const days   = s.daysLeft;
+    const endTxt = days !== null ? (days === 0 ? 'today' : `${days}d left`) : '';
+    const dollarAmt = bankroll > 0
+      ? `≈ $${(bankroll * s.halfKellyPct / 100).toLocaleString('en-US',{maximumFractionDigits:0})}`
+      : '';
+
+    const sigsHtml = s.signals.map(sig => `
+      <div class="sg-sr ${sig.severity}">
+        <span class="si">${siIcon(sig.type)}</span>
+        <span class="sd">${esc(sig.detail)}</span>
+      </div>`).join('');
+
+    const barW = Math.min(s.halfKellyPct / 20 * 100, 100).toFixed(1);
+
+    return `
+    <div class="sg sg-${tier}">
+      <div class="sg-head">
+        <div class="conf-ring ${tier}">
+          <span class="conf-num">${s.confidence}</span>
+          <span class="conf-lbl">CONF</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="sg-meta">
+            <span class="dir-badge dir-${s.direction.toLowerCase()}">BUY ${s.direction}</span>
+            <span class="cat-pill">${esc(s.category)}</span>
+            ${endTxt ? `<span class="days-pill">${endTxt}</span>` : ''}
+          </div>
+          <div class="sg-q">
+            <a href="${polyUrl(s.slug, s.id)}" target="_blank" rel="noopener">${esc(s.question)}</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="trade-box">
+        <div class="trade-row">
+          <div class="trade-stat">
+            <span>Entry</span><span>${fp(s.entryPrice)}</span>
+          </div>
+          <div class="trade-stat">
+            <span>Est. True Prob</span><span>${fp(s.estimatedProb)}</span>
+          </div>
+          <div class="trade-stat">
+            <span>Edge</span><span style="color:var(--green)">+${(s.edge*100).toFixed(1)}%</span>
+          </div>
+          <div class="trade-stat">
+            <span>24h Vol</span><span>${fv(s.volume24h)}</span>
+          </div>
+        </div>
+        <div class="sz-label">
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span class="sz-pct ${tier}">${s.halfKellyPct}%</span>
+            <span class="sz-dollar">${dollarAmt}</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="sz-risk">${s.risk}</span>
+            <span style="font-size:11px;color:var(--muted)">of bankroll (½ Kelly)</span>
+          </div>
+        </div>
+        <div class="sz-track">
+          <div class="sz-fill ${tier}" style="width:${barW}%"></div>
+        </div>
+      </div>
+
+      <div class="sg-sigs">${sigsHtml}</div>
+
+      <div class="sg-ft">
+        <div class="ic-vs">
+          <div class="vi"><span>YES</span><span>${fp(s.yesPrice)}</span></div>
+          <div class="vi"><span>NO</span><span>${fp(s.noPrice)}</span></div>
+          <div class="vi"><span>Total Vol</span><span>${fv(s.volumeTotal)}</span></div>
+        </div>
+        <div class="sg-ac">
+          <a class="btn-pm" href="${polyUrl(s.slug,s.id)}" target="_blank" rel="noopener">View ↗</a>
+          ${cid ? `<button class="btn-tr" onclick="openTrades('${esc(cid)}','${esc(s.question).replace(/'/g,"\\'")}')">🐳 Trades</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadAndRenderSg() {
+  el('cg-sg').innerHTML = '<div class="ld"><div class="sp"></div>Calculating…</div>';
+  el('ct-sg').textContent = '—';
+  try {
+    await loadSuggestions();
+    renderSg();
+  } catch(e) {
+    el('cg-sg').innerHTML = `<div class="err">Error: ${esc(e.message||'unknown')}</div>`;
+  }
+}
+
+// ── tabs ───────────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  ['tr','in','sg'].forEach(t => {
+    el(`t-${t}`).classList.toggle('on', t === tab);
+    el(`p-${t}`).classList.toggle('on', t === tab);
+  });
+}
+
+// ── main load ──────────────────────────────────────────────
+async function loadAndRender() {
+  el('tb-tr').innerHTML = '<tr><td colspan="8"><div class="ld"><div class="sp"></div>Loading…</div></td></tr>';
+  el('cg-in').innerHTML = '<div class="ld"><div class="sp"></div>Scanning…</div>';
+  el('cg-sg').innerHTML = '<div class="ld"><div class="sp"></div>Calculating suggestions…</div>';
+  ['ct-tr','ct-in','ct-sg'].forEach(id => el(id).textContent = '—');
+
+  const [r1, r2, r3] = await Promise.allSettled([loadTrending(), loadInsider(), loadSuggestions()]);
+
+  if (r1.status === 'fulfilled') renderTr();
+  else el('tb-tr').innerHTML = `<tr><td colspan="8"><div class="err">Error: ${esc(r1.reason?.message||'unknown')}</div></td></tr>`;
+
+  if (r2.status === 'fulfilled') renderIn();
+  else el('cg-in').innerHTML = `<div class="err">Error: ${esc(r2.reason?.message||'unknown')}</div>`;
+
+  if (r3.status === 'fulfilled') renderSg();
+  else el('cg-sg').innerHTML = `<div class="err">Error: ${esc(r3.reason?.message||'unknown')}</div>`;
+}
+
+async function refresh() {
+  resetCd();
+  await Promise.all([loadAndRender(), loadStats()]);
+}
+
+function resetCd() {
+  cdVal = 60;
+  el('cd').textContent = 60;
+  clearInterval(cdId);
+  cdId = setInterval(() => {
+    el('cd').textContent = --cdVal;
+    if (cdVal <= 0) refresh();
+  }, 1000);
+}
+
+// ── theme switcher (shared with main site via localStorage) ──
+const themeBtns = document.querySelectorAll('.theme-btn');
+themeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.t;
+    document.body.setAttribute('data-theme', t);
+    themeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    localStorage.setItem('mg-theme', t);
+  });
+});
+const savedTheme = localStorage.getItem('mg-theme') || '1';
+document.body.setAttribute('data-theme', savedTheme);
+themeBtns.forEach(b => b.classList.toggle('active', b.dataset.t === savedTheme));
+
+// ── boot ───────────────────────────────────────────────────
+(async () => {
+  await loadCats();
+  await refresh();
+})();
+</script>
+</body>
+</html>

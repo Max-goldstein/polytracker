@@ -1,0 +1,8 @@
+services:
+  polytracker:
+    build: .
+    container_name: polytracker
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+
